@@ -859,13 +859,15 @@
         const N = cities.length;
         if (off > N / 2) off -= N;
         if (off < -N / 2) off += N;
+        const hidden = Math.abs(off) > 2;
         off = Math.max(-2, Math.min(2, off));
         const slot = off + 2;
         const pos = slotPos[slot];
         el.style.transform = `translate(-50%, 0) translate(${pos.x}px, ${pos.y}px) rotate(${pos.rot}deg) scale(${pos.scale})`;
-        el.style.opacity = pos.op;
+        el.style.opacity = hidden ? 0 : pos.op;
         el.style.filter = 'none';
-        el.style.zIndex = pos.z;
+        el.style.zIndex = hidden ? 0 : pos.z;
+        el.style.pointerEvents = hidden ? 'none' : '';
         const isActive = (i === active);
         el.classList.toggle('is-active', isActive);
         if (!isActive) el.classList.remove('is-flipped');
