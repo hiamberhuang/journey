@@ -30,13 +30,13 @@
     }
     header.meta .brand { color: var(--ink); letter-spacing: 0.32em; font-weight: 500; }
     header.meta .sep { margin: 0 10px; color: var(--ink-faint); }
-    .lang-mini { display: inline-flex; gap: 2px; margin-left: 12px; }
-    .lang-mini button {
+    .lang-float { position: fixed; top: 10px; right: 14px; z-index: 50; display: inline-flex; gap: 2px; }
+    .lang-float button {
       font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
       padding: 2px 8px; border: 1px solid var(--line); background: transparent; color: var(--ink-soft);
       cursor: pointer; border-radius: 999px;
     }
-    .lang-mini button.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    .lang-float button.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 
     .row { flex: 1 1 auto; min-height: 0; display: flex; gap: clamp(12px, 2.4vw, 28px); justify-content: center; align-items: center; padding-top: clamp(8px, 2vh, 18px); }
     .card {
@@ -81,10 +81,7 @@
 </head>
 <body>
   <div class="wrap">
-    <header class="meta">
-      <div><span class="brand">Cases</span><span class="sep">·</span><span lang="en">Featured plays</span><span lang="zh">代表战役</span></div>
-      <div><span lang="en">Rednote · TikTok · bilibili</span><span lang="zh">小红书 · TikTok · bilibili</span><span class="lang-mini"><button data-lang="en">EN</button><button data-lang="zh">中</button></span></div>
-    </header>
+    <div class="lang-float"><button data-lang="en">EN</button><button data-lang="zh">中</button></div>
 
     <div class="row">
       <a class="card" href="https://amberhuang.world/#cases" target="_blank" rel="noopener">
@@ -122,15 +119,12 @@
       </a>
     </div>
 
-    <footer class="meta">
-      <span><span lang="en">Full case write-ups on</span><span lang="zh">完整案例拆解在</span> <a href="https://amberhuang.world/#cases" target="_blank" rel="noopener">amberhuang.world</a></span>
-      <span>Insight → Strategy → Outcome</span>
-    </footer>
+    
   </div>
 
   <script>
     (function() {
-      const btns = document.querySelectorAll('.lang-mini button');
+      const btns = document.querySelectorAll('.lang-float button');
       function setLang(l) {
         document.documentElement.setAttribute('lang', l);
         btns.forEach(b => b.classList.toggle('active', b.dataset.lang === l));

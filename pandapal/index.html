@@ -30,13 +30,13 @@
     }
     header.meta .brand { color: var(--ink); letter-spacing: 0.32em; font-weight: 500; }
     header.meta .sep { margin: 0 10px; color: var(--ink-faint); }
-    .lang-mini { display: inline-flex; gap: 2px; margin-left: 12px; }
-    .lang-mini button {
+    .lang-float { position: fixed; top: 10px; right: 14px; z-index: 50; display: inline-flex; gap: 2px; }
+    .lang-float button {
       font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
       padding: 2px 8px; border: 1px solid var(--line); background: transparent; color: var(--ink-soft);
       cursor: pointer; border-radius: 999px;
     }
-    .lang-mini button.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    .lang-float button.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 
     .main { flex: 1 1 auto; min-height: 0; display: flex; gap: clamp(18px, 3.5vw, 44px); align-items: center; padding-top: clamp(8px, 2vh, 20px); }
     .left { flex: 1 1 54%; min-width: 0; }
@@ -48,7 +48,7 @@
     .para b { color: var(--ink); font-weight: 500; }
 
     .stats { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(8px, 1.8vh, 18px) 24px; margin-bottom: clamp(10px, 2.4vh, 22px); }
-    .stat .num { font-family: var(--serif); font-size: clamp(22px, 4.6vh, 34px); font-weight: 600; line-height: 1; margin: 0; }
+    .stat { cursor: default; } .stat:hover .num { color: var(--violet); } .stat .num { transition: color .25s; font-family: var(--serif); font-size: clamp(22px, 4.6vh, 34px); font-weight: 600; line-height: 1; margin: 0; }
     .stat .num .plus { color: var(--violet); }
     .stat .lbl { font-family: var(--mono); font-size: clamp(8px, 1.5vh, 10px); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); margin: 4px 0 0; }
 
@@ -78,10 +78,7 @@
 </head>
 <body>
   <div class="wrap">
-    <header class="meta">
-      <div><span class="brand">Founded</span><span class="sep">·</span><span lang="en">PandaPal</span><span lang="zh">PandaPal · 创业</span></div>
-      <div><span lang="en">USC · 2023</span><span lang="zh">USC · 2023</span><span class="lang-mini"><button data-lang="en">EN</button><button data-lang="zh">中</button></span></div>
-    </header>
+    <div class="lang-float"><button data-lang="en">EN</button><button data-lang="zh">中</button></div>
 
     <div class="main">
       <div class="left">
@@ -94,10 +91,10 @@
           <span lang="zh">我和搭档为毕设做的一个 USC 学生社区——<b>18 个月做到 4 万用户，零广告预算。</b>这是教会我"没钱投放时品牌到底是怎么长出来的"那次 0→1，也奠定了我后来带每一支团队的操盘底层。</span>
         </p>
         <div class="stats">
-          <div class="stat"><p class="num">40k<span class="plus">+</span></p><p class="lbl"><span lang="en">Users · zero ad spend</span><span lang="zh">用户 · 零广告预算</span></p></div>
-          <div class="stat"><p class="num">1k<span class="plus">+</span></p><p class="lbl"><span lang="en">Campus ambassadors</span><span lang="zh">校园大使</span></p></div>
-          <div class="stat"><p class="num">100<span class="plus">+</span></p><p class="lbl"><span lang="en">Active communities</span><span lang="zh">活跃社群</span></p></div>
-          <div class="stat"><p class="num">80<span class="plus">+</span></p><p class="lbl"><span lang="en">Brand partnerships · AOV $1k</span><span lang="zh">品牌合作 · 客单 $1k</span></p></div>
+          <div class="stat"><p class="num"><span class="val" data-target="40" data-suffix="k">40k</span><span class="plus">+</span></p><p class="lbl"><span lang="en">Users · zero ad spend</span><span lang="zh">用户 · 零广告预算</span></p></div>
+          <div class="stat"><p class="num"><span class="val" data-target="1" data-suffix="k">1k</span><span class="plus">+</span></p><p class="lbl"><span lang="en">Campus ambassadors</span><span lang="zh">校园大使</span></p></div>
+          <div class="stat"><p class="num"><span class="val" data-target="100" data-suffix="">100</span><span class="plus">+</span></p><p class="lbl"><span lang="en">Active communities</span><span lang="zh">活跃社群</span></p></div>
+          <div class="stat"><p class="num"><span class="val" data-target="80" data-suffix="">80</span><span class="plus">+</span></p><p class="lbl"><span lang="en">Brand partnerships · AOV $1k</span><span lang="zh">品牌合作 · 客单 $1k</span></p></div>
         </div>
         <blockquote class="vision">
           <span lang="en">"A one-stop lifestyle platform for overseas Chinese students — built by USC students, for USC students."</span>
@@ -117,7 +114,7 @@
 
   <script>
     (function() {
-      const btns = document.querySelectorAll('.lang-mini button');
+      const btns = document.querySelectorAll('.lang-float button');
       function setLang(l) {
         document.documentElement.setAttribute('lang', l);
         btns.forEach(b => b.classList.toggle('active', b.dataset.lang === l));
@@ -126,6 +123,29 @@
       let saved = null; try { saved = localStorage.getItem('journey-lang'); } catch(e) {}
       setLang(saved || 'zh');
       btns.forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+    })();
+  </script>
+
+  <script>
+    (function() {
+      function animate(el) {
+        const target = +el.dataset.target, suf = el.dataset.suffix || '';
+        const dur = 900, t0 = performance.now();
+        function step(now) {
+          const p = Math.min(1, (now - t0) / dur);
+          const ease = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.round(target * ease) + suf;
+          if (p < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      }
+      document.querySelectorAll('.stat').forEach(s => {
+        const v = s.querySelector('.val');
+        if (v) s.addEventListener('mouseenter', () => animate(v));
+      });
+      window.addEventListener('load', () => {
+        document.querySelectorAll('.val').forEach((v, i) => setTimeout(() => animate(v), 250 + i * 130));
+      });
     })();
   </script>
 </body>
