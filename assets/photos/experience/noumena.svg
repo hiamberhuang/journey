@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5B21B6"/>
+      <stop offset="0.55" stop-color="#4C1D95"/>
+      <stop offset="1" stop-color="#2E1065"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="1000" fill="url(#g)"/>
+  <g fill="none" stroke="rgba(237,233,254,0.22)" stroke-width="1.5">
+    <ellipse cx="400" cy="520" rx="290" ry="290"/>
+    <ellipse cx="400" cy="520" rx="290" ry="120"/>
+    <ellipse cx="400" cy="520" rx="120" ry="290"/>
+    <line x1="110" y1="520" x2="690" y2="520"/>
+  </g>
+  <circle cx="505" cy="415" r="9" fill="#EDE9FE"/>
+  <text x="400" y="880" text-anchor="middle" font-family="JetBrains Mono, Menlo, monospace" font-size="30" letter-spacing="10" fill="#EDE9FE">NOUMENA</text>
+  <text x="400" y="925" text-anchor="middle" font-family="JetBrains Mono, Menlo, monospace" font-size="18" letter-spacing="6" fill="rgba(237,233,254,0.65)">SHANGHAI · 2026 →</text>
+</svg>

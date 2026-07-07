@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Amber's Journey · Experience Atlas</title>
+  <meta name="description" content="Amber Huang's career journey as an interactive atlas — fanned experience cards + a half-dome globe. Vanilla JS + SVG + CSS, zero dependencies. Embeds anywhere an iframe goes (Feishu docs included)." />
+  <meta property="og:title" content="Amber's Journey · Experience Atlas" />
+  <meta property="og:description" content="USC → Meituan → bilibili → Noumena, on a rotating half-dome globe." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #FAF9F7; --paper: #fbfaf6; --paper-back: #f4f1ea;
+      --ink: #0F1419; --ink-soft: rgba(15,20,25,0.55); --ink-faint: rgba(15,20,25,0.18);
+      --line: rgba(15,20,25,0.14); --line-soft: rgba(15,20,25,0.07);
+      --violet: #5B21B6; --violet-soft: rgba(91,33,182,0.12);
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-weight: 300; -webkit-font-smoothing: antialiased; }
+    html[lang="en"] [lang="zh"] { display: none !important; }
+    html[lang="zh"] [lang="en"] { display: none !important; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 18px 22px 26px; }
+    header.meta {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft);
+      padding-bottom: 12px; border-bottom: 1px solid var(--line-soft);
+    }
+    header.meta .brand { color: var(--ink); letter-spacing: 0.32em; font-weight: 500; }
+    header.meta .sep { margin: 0 10px; color: var(--ink-faint); }
+    header.meta .right { white-space: nowrap; }
+    .lang-mini { display: inline-flex; gap: 2px; margin-left: 12px; }
+    .lang-mini button {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 2px 8px; border: 1px solid var(--line); background: transparent; color: var(--ink-soft);
+      cursor: pointer; border-radius: 999px;
+    }
+    .lang-mini button.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    footer.meta {
+      display: flex; justify-content: space-between; gap: 12px;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft);
+      padding-top: 14px; border-top: 1px solid var(--line-soft);
+    }
+    footer.meta a { color: var(--violet); text-decoration: none; }
+
+/* ============================================================
+       ATLAS · Experience section · Fanned cards + half-dome globe
+       ============================================================ */
+    .atlas-stage {
+      --card-h: clamp(360px, 50vh, 440px);
+      --card-w-side:   calc(var(--card-h) * 0.55);
+      --card-w-active: calc(var(--card-h) * 0.75); /* 3:4 vertical */
+      position: relative;
+    }
+    .atlas-meta {
+      display: flex; align-items: baseline; justify-content: space-between;
+      font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', monospace;
+      font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 8px;
+    }
+    .atlas-meta .brand { color: var(--ink); letter-spacing: 0.32em; font-weight: 500; }
+    .atlas-meta .sep { margin: 0 12px; color: rgba(15,20,25,0.18); }
+
+    .atlas-cards-wrap {
+      position: relative; width: 100%;
+      display: flex; justify-content: center;
+      padding-top: clamp(8px, 2vh, 24px);
+    }
+    .atlas-cards {
+      position: relative;
+      width: min(1000px, 96vw);
+      height: calc(var(--card-h) * 1.18);
+      perspective: 1800px;
+    }
+    .atlas-card {
+      position: absolute; top: 0; left: 50%;
+      width: var(--card-w-side); height: var(--card-h);
+      background: transparent;
+      cursor: pointer; user-select: none;
+      transform-origin: 50% 50%;
+      will-change: transform, opacity, width;
+      transition:
+        transform 900ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity   600ms ease,
+        filter    600ms ease,
+        width     900ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .atlas-card.is-active { width: var(--card-w-active); }
+    .atlas-flip {
+      position: absolute; inset: 0;
+      transform-style: preserve-3d;
+      transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .atlas-card.is-flipped .atlas-flip { transform: rotateY(180deg); }
+    .atlas-face {
+      position: absolute; inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      background: #fbfaf6;
+      border-radius: 4px;
+      border: 1px solid rgba(15,20,25,0.14);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      padding: 11px 11px 13px; gap: 9px;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.6) inset,
+        0 18px 40px -28px rgba(15,20,25,0.4),
+        0 4px 12px -8px rgba(15,20,25,0.16);
+    }
+    .atlas-card.is-active .atlas-face {
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.6) inset,
+        0 28px 60px -28px rgba(15,20,25,0.5),
+        0 8px 22px -10px rgba(91,33,182,0.22);
+    }
+    .atlas-face.back {
+      transform: rotateY(180deg);
+      background: #ffffff;
+      padding: 28px 26px 18px;
+      gap: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    /* New Grace-style back face */
+    .back-era {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .back-era-rule {
+      flex: 0 0 44px;
+      height: 1.5px;
+      background: var(--violet);
+      border-radius: 1px;
+    }
+    .back-era-label {
+      font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.3em;
+      color: var(--violet);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .back-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .back-title {
+      font-family: 'Cormorant Garamond', 'Noto Serif SC', Georgia, serif;
+      font-size: clamp(26px, 3.4vh, 34px);
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+    }
+    .back-subtitle {
+      font-family: 'Inter', 'Noto Sans SC', 'PingFang SC', system-ui, sans-serif;
+      font-size: 13px;
+      color: var(--violet);
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .back-body {
+      font-family: 'Inter', 'Noto Sans SC', 'PingFang SC', system-ui, sans-serif;
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-top: 6px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 8;
+      -webkit-box-orient: vertical;
+    }
+    .back-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid rgba(15,20,25,0.08);
+    }
+    .back-city {
+      font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', monospace;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: var(--muted);
+    }
+    .back-flip {
+      font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', monospace;
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      color: var(--violet);
+      cursor: pointer;
+    }
+    .atlas-photo {
+      position: relative; flex: 1;
+      border-radius: 2px; overflow: hidden;
+      background: #999;
+    }
+    .atlas-photo::before {
+      content: ""; position: absolute; inset: 0;
+      background: repeating-linear-gradient(135deg,
+        rgba(255,255,255,0.05) 0 7px,
+        rgba(0,0,0,0.06) 7px 14px);
+    }
+    .atlas-photo::after {
+      content: attr(data-tag);
+      position: absolute; left: 12px; bottom: 10px; right: 12px;
+      font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', monospace;
+      font-size: 9px; letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.9); text-transform: uppercase;
+    }
+    .atlas-photo .coord {
+      position: absolute; top: 10px; left: 12px;
+      font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', monospace;
+      font-size: 9px; letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.78);
+    }
+    .atlas-photo .corner {
+      position: absolute; top: 10px; right: 12px;
+      font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', monospace;
+      font-size: 9px; letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.78);
+    }
+    .atlas-card[data-city="usc"]      .atlas-photo { background: linear-gradient(155deg, #dcbb87 0%, #9c7339 55%, #4d3514 100%); }
+    .atlas-card[data-city="cbs"]      .atlas-photo { background: linear-gradient(155deg, #4a6fa5 0%, #2c4670 55%, #0a1a2d 100%); }
+    .atlas-card[data-city="tiktal"]   .atlas-photo { background: linear-gradient(155deg, #1f1f1f 0%, #0a0a0a 100%); }
+    .atlas-card[data-city="meituan"]  .atlas-photo { background: linear-gradient(155deg, #fbbf24 0%, #d97706 55%, #92400e 100%); }
+    .atlas-card[data-city="bilibili"] .atlas-photo { background: linear-gradient(155deg, #5b6f9d 0%, #2c3a5d 55%, #0f1730 100%); }
+    /* Real photo overlay (sits on top of gradient fallback) */
+    .atlas-photo-img {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+    .atlas-card[data-city="bilibili"] .atlas-photo-img { object-position: center top; }
+    .atlas-photo .coord,
+    .atlas-photo .corner,
+    .atlas-photo::after { z-index: 1; }
+    .atlas-photo::before { z-index: 0; }
+
+    .atlas-label .place {
+      font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+      font-size: clamp(18px, 2.4vh, 24px);
+      line-height: 1.05; color: var(--ink);
+    }
+    .atlas-label .country {
+      margin-top: 5px;
+      font-family: 'Inter', 'Noto Sans SC', 'PingFang SC', system-ui, sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.01em;
+      line-height: 1.3;
+    }
+    .atlas-label .meta-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-top: 6px;
+      opacity: 0; transform: translateY(2px);
+      transition: opacity 400ms ease 200ms, transform 400ms ease 200ms;
+    }
+    .atlas-card.is-active .atlas-label .meta-row { opacity: 1; transform: none; }
+    .atlas-label .project {
+      font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', monospace;
+      font-size: 9px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .atlas-label .flip-hint {
+      font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', monospace;
+      font-size: 9px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--violet);
+    }
+    .atlas-face.back .back-head {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', monospace;
+      font-size: 9px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .atlas-face.back .back-head .ind { color: var(--violet); }
+    .atlas-face.back .proj-title {
+      font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+      font-size: clamp(22px, 3vh, 28px);
+      line-height: 1.05; color: var(--ink); margin-top: 2px;
+    }
+    .atlas-face.back .proj-sub {
+      font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+      font-style: italic; font-size: 13px;
+      color: var(--muted); line-height: 1.35;
+    }
+    .atlas-face.back .divider { height: 1px; background: rgba(15,20,25,0.14); }
+    .atlas-face.back .grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px;
+    }
+    .atlas-face.back .cell { display: flex; flex-direction: column; gap: 4px; }
+    .atlas-face.back .k {
+      font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', monospace;
+      font-size: 8.5px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: rgba(15,20,25,0.45);
+    }
+    .atlas-face.back .v { font-size: 12px; color: var(--ink); }
+    .atlas-face.back .body {
+      font-size: 12.5px; line-height: 1.55; color: var(--muted); flex: 1;
+    }
+    .atlas-face.back .back-foot {
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', monospace;
+      font-size: 9.5px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--violet);
+    }
+    .atlas-face.back .back-foot .neut { color: var(--muted); }
+
+    .atlas-globe-section {
+      display: flex; flex-direction: column; align-items: center;
+      gap: clamp(6px, 1.4vh, 14px);
+      margin-top: 28px;
+    }
+    .atlas-readout {
+      display: grid; grid-template-columns: 1fr auto 1fr; align-items: end;
+      width: min(720px, 96vw); gap: 12px; padding: 0 8px;
+    }
+    .atlas-readout .left, .atlas-readout .right {
+      font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', monospace;
+      font-size: 10px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .atlas-readout .left { text-align: left; }
+    .atlas-readout .right { text-align: right; }
+    .atlas-readout .center { text-align: center; transition: opacity 300ms ease; }
+    .atlas-readout .center .place {
+      font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+      font-style: italic;
+      font-size: clamp(20px, 2.6vh, 26px);
+      color: var(--ink); line-height: 1;
+    }
+    .atlas-readout .center .coords {
+      margin-top: 6px;
+      font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', monospace;
+      font-size: 10px; letter-spacing: 0.22em;
+      color: var(--violet);
+    }
+    .atlas-globe-svg {
+      width: min(940px, 98vw);
+      aspect-ratio: 96 / 31;
+      max-height: clamp(200px, 34vh, 310px);
+      display: block; overflow: visible;
+    }
+    .atlas-grid-line { stroke: rgba(15,20,25,0.14); fill: none; stroke-width: 0.7; }
+    .atlas-grid-line.soft { stroke: rgba(15,20,25,0.07); }
+    .atlas-horizon { stroke: rgba(15,20,25,0.18); stroke-width: 1; fill: none; }
+    .atlas-eq-tick { stroke: rgba(15,20,25,0.18); stroke-width: 0.6; }
+    .atlas-eq-tick.major { stroke: rgba(15,20,25,0.55); stroke-width: 0.8; }
+    .atlas-pole { fill: rgba(15,20,25,0.55); }
+    .atlas-city-dot {
+      fill: var(--paper); stroke: rgba(15,20,25,0.55); stroke-width: 1;
+      cursor: pointer;
+      transition: fill 400ms ease, stroke 400ms ease;
+    }
+    .atlas-city-dot.active { fill: var(--violet); stroke: var(--violet); }
+    .atlas-city-halo {
+      fill: none; stroke: var(--violet); stroke-width: 1;
+      opacity: 0; pointer-events: none;
+      transition: opacity 400ms ease;
+    }
+    .atlas-city-halo.active {
+      opacity: 0.5;
+      animation: atlas-halo 2.4s ease-out infinite;
+    }
+    @keyframes atlas-halo {
+      0%   { r: 5;  opacity: 0.7; }
+      100% { r: 16; opacity: 0;   }
+    }
+    .atlas-city-label {
+      font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', monospace;
+      font-size: 9px; letter-spacing: 0.16em;
+      fill: rgba(15,20,25,0.45);
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+    .atlas-city-label.active { fill: var(--violet); }
+    .atlas-controls {
+      display: flex; align-items: center; gap: 28px; margin-top: 4px;
+      font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', monospace;
+      font-size: 10px; letter-spacing: 0.22em;
+      color: var(--muted); text-transform: uppercase;
+    }
+    .atlas-controls button {
+      background: none; border: none; font: inherit; color: inherit;
+      letter-spacing: 0.22em; cursor: pointer; padding: 8px 4px;
+      transition: color 200ms ease;
+    }
+    .atlas-controls button:hover { color: var(--ink); }
+    .atlas-pips { display: flex; gap: 10px; align-items: center; }
+    .atlas-pip {
+      width: 18px; height: 1px; background: rgba(15,20,25,0.18);
+      cursor: pointer;
+      transition: background 300ms ease, width 300ms ease, height 300ms ease;
+    }
+    .atlas-pip.active { width: 28px; height: 2px; background: var(--violet); }
+    @media (max-width: 900px) {
+      .atlas-stage { --card-h: clamp(180px, 30vh, 230px); }
+      .atlas-face.back .grid { grid-template-columns: 1fr 1fr; }
+    }
+    /* ====================================================================
+       MOBILE FIX · Experience atlas cards (≤768px)
+       - Hide all non-active cards (fan collapses to single-card view)
+       - Active card scales up to fit comfortably + readable text
+       - Back-face title shrinks so "USC Annenberg" doesn't truncate
+       ==================================================================== */
+    @media (max-width: 768px) {
+      .atlas-stage { --card-h: 380px !important; }
+      .atlas-cards { height: calc(var(--card-h) * 1.06); }
+      /* Hide side cards on mobile — only the active one shows */
+      .atlas-card:not(.is-active) {
+        opacity: 0 !important;
+        pointer-events: none;
+        transform: translate(-50%, 0) scale(0.6) !important;
+      }
+      .atlas-card.is-active {
+        transform: translate(-50%, 0) scale(1) !important;
+        width: min(300px, 78vw) !important;
+        opacity: 1 !important;
+        filter: none !important;
+        z-index: 5 !important;
+      }
+      /* Front face: tighten the meta-row so text doesn't overflow */
+      .atlas-face { padding: 14px 14px 16px; gap: 12px; }
+      .atlas-label .meta-row { flex-wrap: wrap; gap: 8px 12px; }
+      .atlas-label .project { font-size: 8.5px; line-height: 1.5; }
+      .atlas-label .place { font-size: 26px; line-height: 1.05; }
+      .atlas-label .country { font-size: 13px; }
+      /* Back face: smaller title so it fits, more body room */
+      .atlas-face.back { padding: 22px 20px 16px; gap: 14px; }
+      .back-title { font-size: 22px !important; line-height: 1.15; }
+      .back-subtitle { font-size: 12px; }
+      .back-body { font-size: 11.5px; -webkit-line-clamp: 9; }
+      .back-era-label { font-size: 9px; letter-spacing: 0.22em; }
+    }
+
+    /* ===== Feishu 嵌入 · 矮视口压缩 ===== */
+    @media (max-height: 660px) {
+      .wrap { padding: 10px 18px 14px; }
+      .atlas-stage { --card-h: clamp(230px, 40vh, 300px); }
+      .atlas-globe-svg { max-height: 190px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="meta">
+      <div><span class="brand">Journey</span><span class="sep">·</span><span lang="en">Experience Atlas</span><span lang="zh">履历地图</span></div>
+      <div class="right"><span lang="en">LA → Shanghai · 6 stops</span><span lang="zh">洛杉矶 → 上海 · 6 站</span><span class="lang-mini"><button data-lang="en">EN</button><button data-lang="zh">中</button></span></div>
+    </header>
+
+    <div class="atlas-stage">
+      <div class="atlas-cards-wrap">
+        <div class="atlas-cards" id="atlasCards"></div>
+      </div>
+      <section class="atlas-globe-section">
+        <div class="atlas-readout">
+          <div class="left">N · Northern hemisphere</div>
+          <div class="center" id="atlasReadout">
+            <div class="place" id="atlasReadoutPlace">—</div>
+            <div class="coords" id="atlasReadoutCoords">—</div>
+          </div>
+          <div class="right">Bearing · live</div>
+        </div>
+        <svg class="atlas-globe-svg" viewBox="-480 -270 960 310" id="atlasDome" aria-hidden="true">
+          <g id="atlasLatitudes"></g>
+          <g id="atlasLongitudes"></g>
+          <line class="atlas-horizon" x1="-440" y1="0" x2="440" y2="0"></line>
+          <g id="atlasEqTicks"></g>
+          <path class="atlas-horizon" d="M -420 0 A 420 230 0 0 1 420 0" stroke-width="1.2"></path>
+          <g transform="translate(0 -230)">
+            <circle r="2" class="atlas-pole"></circle>
+            <text x="10" y="3" class="atlas-city-label">N</text>
+          </g>
+          <g id="atlasCities"></g>
+        </svg>
+        <div class="atlas-controls">
+          <button id="atlasPrev">‹ Prev</button>
+          <div class="atlas-pips" id="atlasPips"></div>
+          <button id="atlasNext">Next ›</button>
+        </div>
+      </section>
+    </div>
+
+    <footer class="meta">
+      <span>Built by <a href="https://amberhuang.world" target="_blank" rel="noopener">Amber Huang</a></span>
+      <span><a href="https://github.com/hiamberhuang/journey" target="_blank" rel="noopener">GitHub</a><span class="sep">·</span>Vanilla JS + SVG + CSS · 0 dependencies</span>
+    </footer>
+  </div>
+
+  <script>
+    (function() {
+      const btns = document.querySelectorAll('.lang-mini button');
+      function setLang(l) {
+        document.documentElement.setAttribute('lang', l);
+        btns.forEach(b => b.classList.toggle('active', b.dataset.lang === l));
+        try { localStorage.setItem('journey-lang', l); } catch(e) {}
+      }
+      let saved = null; try { saved = localStorage.getItem('journey-lang'); } catch(e) {}
+      setLang(saved || 'zh');
+      btns.forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+    })();
+  </script>
+  <script>
+
+  (function() {
+    const cities = [
+      { id: 'usc', place: 'USC', place_zh: 'USC',
+        city: 'Los Angeles', city_zh: '洛杉矶',
+        country: 'Master of Digital Media', country_zh: '数字媒体硕士',
+        lat: 34.05, lon: -118.24,
+        img: 'assets/photos/experience/usc.jpg',
+        tag: 'A · Where I trained', tag_zh: 'A · 我接受训练的地方',
+        proj: 'USC Annenberg', proj_zh: 'USC Annenberg',
+        sub: 'M.S. Digital Media + PandaPal 0→1.', sub_zh: '数字媒体硕士 + 海外学生社群 PandaPal 0→1。',
+        role: 'Graduate student × Community founder', role_zh: '研究生 × 社群创始人',
+        year: '2021–2023 · 2 yr', year_zh: '2021–2023 · 2 年',
+        team: 'Self-built PandaPal team', team_zh: '自建 PandaPal 团队',
+        kpi: '40k users · 80+ brand deals', kpi_zh: '4 万用户 · 80+ 品牌合作',
+        body: 'USC Annenberg trained the strategy frame in digital media & consumer culture. On the side I built PandaPal 0→1 — an overseas student community that grew to 40k users, 1,000+ campus ambassadors, 100+ groups, and 80+ brand deals (AOV $1k) — all with zero ad budget.',
+        body_zh: 'USC Annenberg 训练了我数字媒体与消费文化的策略框架。课余从 0 到 1 搭起海外学生社群 PandaPal——4 万用户、千余校园大使、上百个社群、80+ 品牌合作（客单 $1k），全程零广告预算。' },
+      { id: 'cbs', place: 'CBS', place_zh: 'CBS',
+        city: 'San Diego', city_zh: '圣地亚哥',
+        country: 'Digital Marketing Intern', country_zh: '数字营销实习生',
+        lat: 32.72, lon: -117.16,
+        img: 'assets/photos/experience/cbs.jpg',
+        tag: 'B · Field rotation', tag_zh: 'B · 实战轮岗',
+        proj: 'CBS News 8 · TEGNA', proj_zh: 'CBS News 8 · TEGNA',
+        sub: 'A summer inside a 700k-DAU broadcaster.', sub_zh: '一个夏天，泡在 70 万 DAU 的本地媒体集团里。',
+        role: 'Digital Marketing Intern', role_zh: '数字营销实习生',
+        year: '2022 · 12 wk', year_zh: '2022 · 12 周',
+        team: 'Editorial × Ad ops', team_zh: '编辑部 × 广告运营',
+        kpi: '20+ social campaigns', kpi_zh: '20+ 社媒投放',
+        body: 'Web & app ad modules at CBS News 8. Twitter / Meta campaigns drove 100k+ flow. Operated Comic-Con + Pride coverage — first lesson in how legacy media gets discovered by Gen Z. Based in San Diego.',
+        body_zh: '负责 CBS News 8 网页与 App 广告模块。Twitter / Meta 投放带来 10 万+ 流量。运营 Comic-Con + Pride 节点报道——上的第一课：老牌媒体是怎么被 Gen Z 重新发现的。' },
+      { id: 'tiktal', place: 'TIKTAL', place_zh: 'TIKTAL',
+        city: 'London', city_zh: '伦敦',
+        country: 'Overseas Marketing', country_zh: '海外增长',
+        lat: 51.5074, lon: -0.1278,
+        img: 'assets/photos/experience/tiktal.jpg',
+        tag: 'C · Where I scaled', tag_zh: 'C · 我跑量的地方',
+        proj: 'TIKTAL · TikTok Official Partner', proj_zh: 'TIKTAL · TikTok 官方合作伙伴',
+        sub: 'CEO-direct. APAC 0→1 + $1M+ KA campaigns.', sub_zh: '直汇 CEO。亚太 0→1 + 百万美元级 KA 战役。',
+        role: 'Overseas Marketing', role_zh: '海外增长',
+        year: '2023–2024', year_zh: '2023–2024',
+        team: 'CEO-direct × KA clients', team_zh: '直汇 CEO × KA 客户',
+        kpi: 'CTR 8% → 20% · +60% sales', kpi_zh: '点击率 8% → 20% · 销售 +60%',
+        body: 'Reported direct to CEO (based in London). Built APAC cold-start pipeline across LinkedIn / X / Reddit. Operated $1M+ KA campaigns for Genki Forest, TEMU, Pop Mart, PetSmart. PetSmart DIY Cake Kit campaign — 30k UGC at $0.03 CPM, sales +60% YoY, 100M+ impressions.',
+        body_zh: '直接汇报伦敦总部 CEO。从 LinkedIn / X / Reddit 三条线搭出亚太冷启动管线。操盘元气森林、TEMU、Pop Mart、PetSmart 等百万美元级 KA 战役。PetSmart DIY 蛋糕套装活动：3 万 UGC、CPM $0.03、销售同比 +60%、亿级曝光。' },
+      { id: 'meituan', place: 'Meituan', place_zh: '美团点评',
+        city: 'Shanghai', city_zh: '上海',
+        country: 'Content Manager · UGC Growth', country_zh: '内容经理 · UGC 增长',
+        lat: 31.18, lon: 121.43,
+        img: 'assets/photos/experience/meituan.jpg',
+        tag: 'D · Where I grew UGC', tag_zh: 'D · 我做 UGC 的地方',
+        proj: 'Meituan-Dianping', proj_zh: '美团-大众点评',
+        sub: 'Content growth before bilibili.', sub_zh: 'bilibili 之前，做内容增长的地方。',
+        role: 'Content Manager · UGC ops', role_zh: '内容经理 · UGC 运营',
+        year: '2024–2025', year_zh: '2024–2025',
+        team: 'Creator × Editorial', team_zh: '作者 × 编辑部',
+        kpi: 'UGC 0 → 1,200/day · +65% dwell', kpi_zh: 'UGC 0 → 日均 1,200 · 停留时长 +65%',
+        body: 'Scaled "Foodie List Partner" creator IP — daily UGC submissions 0 → 1,200, monthly active creators doubled in 6 months, in-app dwell time +65%. Launched "Must-Try Report" — 140M+ views, #1 trending. Based in Shanghai.',
+        body_zh: '操盘"必吃榜伙伴"作者 IP——日均 UGC 投稿从 0 拉到 1,200，月活作者半年翻倍，站内停留时长 +65%。上线"必吃报告"专题——1.4 亿曝光，全站热榜第一。' },
+      { id: 'bilibili', place: 'Bilibili', place_zh: 'bilibili',
+        city: 'Shanghai', city_zh: '上海',
+        country: 'Sr. Influencer Marketing', country_zh: '高级 KOL 营销',
+        lat: 31.30, lon: 121.51,
+        img: 'assets/photos/experience/bilibili.jpg',
+        tag: 'E · Where I shipped', tag_zh: 'E · 我交付过的地方',
+        proj: 'Bilibili', proj_zh: 'bilibili',
+        sub: 'Senior Influencer Marketing.', sub_zh: '高级 KOL 营销。',
+        role: 'Sr. Influencer Marketing · Food & Family', role_zh: '高级 KOL 营销 · 美食 & 亲子',
+        year: '2025 – 2026', year_zh: '2025 – 2026',
+        team: 'PGC × UGC × Brand', team_zh: 'PGC × UGC × 品牌',
+        kpi: '10M-fan IP · #1 hot list', kpi_zh: '千万粉 IP · 全站热榜第一',
+        body: '"Follow Lao Gao to Eat" food-culture IP — 10M+ reach, +200k followers in 6 months, #1 hot list. Co-piloted Bilibili × CCTV Spring Festival Gala — 18 livestreams, 1M+ live entries, 48h top-10. Based in Shanghai.',
+        body_zh: '操盘"跟着老高吃"美食文化 IP——千万级曝光、6 个月涨粉 20 万、全站热榜第一。联动 bilibili × 央视春晚直播——18 场直播、百万级进房、48 小时全站 Top 10。' },
+      { id: 'noumena', place: 'Noumena', place_zh: '物自体',
+        city: 'Shanghai', city_zh: '上海',
+        country: 'AI Transformation Expert', country_zh: 'AI 营销 / PR',
+        lat: 31.23, lon: 121.47,
+        img: 'assets/photos/experience/noumena.svg',
+        tag: 'F · Where I build with AI', tag_zh: 'F · 我和 AI 并肩作战的地方',
+        proj: 'Noumena', proj_zh: '物自体',
+        sub: 'AI-native marketing · GrowClaw.', sub_zh: 'AI 原生营销 · GrowClaw。',
+        role: 'AI Transformation Expert', role_zh: 'AI 转型专家 · 营销/PR',
+        year: '2026 –', year_zh: '2026 –',
+        team: 'Marketing × AI agents', team_zh: '市场 × AI agents',
+        kpi: 'GrowClaw in the making', kpi_zh: 'GrowClaw 打造中',
+        body: 'Joined Noumena in 2026 to build AI-native marketing — official channels, PR, market events and the creator ecosystem, run with a fleet of AI agents. Shipping GrowClaw, the marketing agent.',
+        body_zh: '2026 年加入物自体，做 AI 原生营销——官号内容、对外 PR、市场活动、博主生态，由一队 AI agent 协同运转。正在打造营销 Agent GrowClaw。' }
+    ];
+
+    const RX = 420, RY = 230;
+    function wrapAngle(a) { while (a > 180) a -= 360; while (a < -180) a += 360; return a; }
+    function fmtCoord(lat, lon) {
+      const ns = lat >= 0 ? 'N' : 'S';
+      const ew = lon >= 0 ? 'E' : 'W';
+      return `${Math.abs(lat).toFixed(2)}° ${ns}  ${Math.abs(lon).toFixed(2)}° ${ew}`;
+    }
+    function fmtLonOnly(lon) {
+      lon = wrapAngle(lon);
+      return Math.abs(lon).toFixed(0) + '°' + (lon >= 0 ? 'E' : 'W');
+    }
+    function project(lat, lon, centerLon) {
+      const dLon = wrapAngle(lon - centerLon) * Math.PI / 180;
+      const phi  = lat * Math.PI / 180;
+      return {
+        x:  RX * Math.cos(phi) * Math.sin(dLon),
+        y: -RY * Math.sin(phi),
+        dLon: dLon,
+        front: Math.cos(phi) * Math.cos(dLon)
+      };
+    }
+
+    const cardsEl = document.getElementById('atlasCards');
+    if (!cardsEl) return;
+    cities.forEach((c, i) => {
+      const el = document.createElement('div');
+      el.className = 'atlas-card';
+      el.dataset.index = i;
+      el.dataset.city = c.id;
+      const year = (c.year.match(/\d{4}/)||['—'])[0];
+      el.innerHTML = `
+        <div class="atlas-flip">
+          <div class="atlas-face front">
+            <div class="atlas-photo" data-tag="${c.tag}">
+              ${c.img ? `<img class="atlas-photo-img" src="${c.img}" alt="${c.place}" loading="${i === 0 ? 'eager' : 'lazy'}" decoding="async" fetchpriority="${i === 0 ? 'high' : 'auto'}" />` : ''}
+              <span class="coord">${fmtCoord(c.lat, c.lon)}</span>
+              <span class="corner">${String.fromCharCode(65+i)}/${String(cities.length).padStart(2,'0')}</span>
+            </div>
+            <div class="atlas-label">
+              <div class="place"><span lang="en">${c.place}</span><span lang="zh">${c.place_zh}</span></div>
+              <div class="country"><span lang="en">${c.country}</span><span lang="zh">${c.country_zh}</span></div>
+              <div class="meta-row">
+                <span class="project"><span lang="en">${c.proj.toUpperCase()}  ·  ${c.role}</span><span lang="zh">${c.proj_zh.toUpperCase()}  ·  ${c.role_zh}</span></span>
+                <span class="flip-hint"><span lang="en">Flip →</span><span lang="zh">翻转 →</span></span>
+              </div>
+            </div>
+          </div>
+          <div class="atlas-face back">
+            <div class="back-era">
+              <span class="back-era-rule"></span>
+              <span class="back-era-label"><span lang="en">${year} · ${(c.city || c.place).toUpperCase()}</span><span lang="zh">${year} · ${c.city_zh || c.place_zh}</span></span>
+            </div>
+            <div class="back-content">
+              <h3 class="back-title"><span lang="en">${c.proj}</span><span lang="zh">${c.proj_zh}</span></h3>
+              <p class="back-subtitle"><span lang="en">${c.country}</span><span lang="zh">${c.country_zh}</span></p>
+              <p class="back-body"><span lang="en">${c.body}</span><span lang="zh">${c.body_zh}</span></p>
+            </div>
+            <div class="back-foot">
+              <span class="back-city"></span>
+              <span class="back-flip"><span lang="en">← Flip back</span><span lang="zh">← 翻回</span></span>
+            </div>
+          </div>
+        </div>`;
+      el.addEventListener('click', () => {
+        const idx = parseInt(el.dataset.index, 10);
+        if (idx === active) el.classList.toggle('is-flipped');
+        else setActive(idx);
+      });
+      cardsEl.appendChild(el);
+    });
+
+    const slotPos = [
+      { x: -490, y: 86, rot: -26, scale: 0.78, op: 0.30, blur: 1.6, z: 1 },
+      { x: -300, y: 24, rot: -13, scale: 0.89, op: 0.55, blur: 0.4, z: 2 },
+      { x:    0, y:  0, rot:   0, scale: 1.00, op: 1.00, blur: 0,   z: 5 },
+      { x:  300, y: 24, rot:  13, scale: 0.89, op: 0.55, blur: 0.4, z: 2 },
+      { x:  490, y: 86, rot:  26, scale: 0.78, op: 0.30, blur: 1.6, z: 1 }
+    ];
+
+    const latG = document.getElementById('atlasLatitudes');
+    const lngG = document.getElementById('atlasLongitudes');
+    const tickG = document.getElementById('atlasEqTicks');
+    const cityG = document.getElementById('atlasCities');
+
+    [15, 30, 45, 60, 75].forEach(L => {
+      const phi = L * Math.PI / 180;
+      const y = -RY * Math.sin(phi);
+      const w =  RX * Math.cos(phi);
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', -w); line.setAttribute('x2', w);
+      line.setAttribute('y1', y);  line.setAttribute('y2', y);
+      line.setAttribute('class', 'atlas-grid-line soft');
+      latG.appendChild(line);
+    });
+
+    const meridianLons = [];
+    const meridianPaths = [];
+    for (let L = 0; L < 360; L += 15) {
+      meridianLons.push(L);
+      const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      p.setAttribute('class', 'atlas-grid-line soft');
+      lngG.appendChild(p);
+      meridianPaths.push(p);
+    }
+
+    const tickLons = [];
+    const tickLines = [];
+    const tickLabels = [];
+    for (let L = 0; L < 360; L += 5) {
+      tickLons.push(L);
+      const t = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      const isMajor = (L % 30) === 0;
+      t.setAttribute('class', 'atlas-eq-tick' + (isMajor ? ' major' : ''));
+      tickG.appendChild(t);
+      tickLines.push(t);
+      if (isMajor) {
+        const tx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        tx.setAttribute('text-anchor', 'middle');
+        tx.setAttribute('class', 'atlas-city-label');
+        tickG.appendChild(tx);
+        tickLabels.push(tx);
+      } else tickLabels.push(null);
+    }
+
+    const cityNodes = cities.map((c, i) => {
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      const halo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      halo.setAttribute('class', 'atlas-city-halo'); halo.setAttribute('r', 5);
+      g.appendChild(halo);
+      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot.setAttribute('r', 4); dot.setAttribute('class', 'atlas-city-dot');
+      dot.addEventListener('click', () => setActive(i));
+      g.appendChild(dot);
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.setAttribute('class', 'atlas-city-label');
+      const above = c.lat < 35;
+      label.setAttribute('y', above ? -12 : 20);
+      label.setAttribute('text-anchor', 'middle');
+      label.textContent = (c.city || c.place).toUpperCase();
+      g.appendChild(label);
+      cityG.appendChild(g);
+      return { g, dot, halo, label, city: c };
+    });
+
+    const pipsEl = document.getElementById('atlasPips');
+    cities.forEach((c, i) => {
+      const p = document.createElement('div');
+      p.className = 'atlas-pip';
+      p.addEventListener('click', () => setActive(i));
+      pipsEl.appendChild(p);
+    });
+
+    let active = 0;
+    let centerLon = cities[active].lon;
+    let raf = null;
+
+    function meridianPath(dLonDeg) {
+      const dLon = dLonDeg * Math.PI / 180;
+      const xEq = RX * Math.sin(dLon);
+      if (Math.abs(xEq) < 0.6) return `M 0 0 L 0 ${-RY}`;
+      const rx = Math.abs(xEq), ry = RY;
+      const sweep = xEq > 0 ? 0 : 1;
+      return `M ${xEq} 0 A ${rx} ${ry} 0 0 ${sweep} 0 ${-RY}`;
+    }
+
+    function redraw() {
+      meridianLons.forEach((L, i) => {
+        const d = wrapAngle(L - centerLon);
+        const path = meridianPaths[i];
+        if (Math.abs(d) > 88) { path.setAttribute('opacity', '0'); return; }
+        const vis = Math.cos(d * Math.PI / 180);
+        path.setAttribute('opacity', (Math.max(0, vis * vis * 0.9 + 0.05)).toFixed(3));
+        path.setAttribute('d', meridianPath(d));
+      });
+      tickLons.forEach((L, i) => {
+        const d = wrapAngle(L - centerLon);
+        const t = tickLines[i];
+        if (Math.abs(d) > 90) {
+          t.setAttribute('opacity', '0');
+          const lab = tickLabels[i];
+          if (lab) lab.setAttribute('opacity', '0');
+          return;
+        }
+        const x = RX * Math.sin(d * Math.PI / 180);
+        const isMajor = (L % 30) === 0;
+        const len = isMajor ? 8 : 4;
+        const fade = Math.cos(d * Math.PI / 180);
+        const op = Math.max(0, fade * fade);
+        t.setAttribute('x1', x); t.setAttribute('x2', x);
+        t.setAttribute('y1', 0); t.setAttribute('y2', len);
+        t.setAttribute('opacity', op.toFixed(3));
+        const lab = tickLabels[i];
+        if (lab) {
+          lab.setAttribute('x', x); lab.setAttribute('y', 22);
+          lab.setAttribute('opacity', op.toFixed(3));
+          lab.textContent = fmtLonOnly(L);
+        }
+      });
+      cityNodes.forEach((node, i) => {
+        const p = project(node.city.lat, node.city.lon, centerLon);
+        node.g.setAttribute('transform', `translate(${p.x.toFixed(2)} ${p.y.toFixed(2)})`);
+        const visible = p.front > 0;
+        const fadeIn = Math.max(0, p.front * 2);
+        const opacity = Math.min(1, fadeIn) * (visible ? 1 : 0);
+        const isActive = (i === active);
+        node.dot.classList.toggle('active', isActive);
+        node.dot.setAttribute('r', isActive ? 5 : 3.5);
+        node.dot.setAttribute('opacity', opacity.toFixed(3));
+        node.halo.classList.toggle('active', isActive);
+        node.halo.setAttribute('opacity', isActive ? Math.min(0.7, opacity).toFixed(3) : '0');
+        node.label.classList.toggle('active', isActive);
+        node.label.setAttribute('opacity', (opacity * (isActive ? 1 : 0.85)).toFixed(3));
+      });
+    }
+
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+    function rotateTo(targetLon) {
+      if (raf) cancelAnimationFrame(raf);
+      const start = centerLon;
+      const delta = wrapAngle(targetLon - start);
+      const dist = Math.abs(delta);
+      const dur = Math.max(600, Math.min(1500, 600 + dist * 5));
+      const t0 = performance.now();
+      function step(now) {
+        const t = Math.min(1, (now - t0) / dur);
+        centerLon = start + delta * easeInOutCubic(t);
+        redraw();
+        if (t < 1) raf = requestAnimationFrame(step);
+        else { centerLon = targetLon; redraw(); }
+      }
+      raf = requestAnimationFrame(step);
+    }
+
+    function layoutCards() {
+      const els = cardsEl.querySelectorAll('.atlas-card');
+      els.forEach((el, i) => {
+        let off = i - active;
+        const N = cities.length;
+        if (off > N / 2) off -= N;
+        if (off < -N / 2) off += N;
+        off = Math.max(-2, Math.min(2, off));
+        const slot = off + 2;
+        const pos = slotPos[slot];
+        el.style.transform = `translate(-50%, 0) translate(${pos.x}px, ${pos.y}px) rotate(${pos.rot}deg) scale(${pos.scale})`;
+        el.style.opacity = pos.op;
+        el.style.filter = pos.blur > 0 ? `blur(${pos.blur}px)` : 'none';
+        el.style.zIndex = pos.z;
+        const isActive = (i === active);
+        el.classList.toggle('is-active', isActive);
+        if (!isActive) el.classList.remove('is-flipped');
+      });
+      pipsEl.querySelectorAll('.atlas-pip').forEach((p, i) => p.classList.toggle('active', i === active));
+      const c = cities[active];
+      document.getElementById('atlasReadoutPlace').textContent = (c.city || c.place) + ' · ' + c.place;
+      document.getElementById('atlasReadoutCoords').textContent = fmtCoord(c.lat, c.lon);
+    }
+
+    function setActive(i) {
+      active = ((i % cities.length) + cities.length) % cities.length;
+      layoutCards();
+      rotateTo(cities[active].lon);
+    }
+
+    layoutCards();
+    redraw();
+    document.getElementById('atlasPrev').addEventListener('click', () => setActive(active - 1));
+    document.getElementById('atlasNext').addEventListener('click', () => setActive(active + 1));
+  })();
+  
+  </script>
+</body>
+</html>
