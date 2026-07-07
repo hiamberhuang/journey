@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Contact · Amber Huang</title>
+  <meta name="description" content="Add Amber on Feishu or WeChat — coffee chat, podcast, expo & campus collaborations." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #ffffff; --ink: #0F1419; --ink-soft: rgba(15,20,25,0.58); --ink-faint: rgba(15,20,25,0.35);
+      --line: rgba(15,20,25,0.12); --line-soft: rgba(15,20,25,0.07);
+      --violet: #5B21B6; --violet-soft: #EDE9FE;
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font-family: var(--sans); font-weight: 300; -webkit-font-smoothing: antialiased; }
+    body { overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .card {
+      width: min(920px, calc(100vw - 32px)); max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px);
+      background: #fdfdfc; border: 1px solid var(--line-soft); border-radius: 6px;
+      padding: clamp(16px, 4vh, 34px) clamp(20px, 4vw, 44px);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .rule { height: 1px; background: var(--line); flex: 0 0 auto; }
+    .brand-row { display: flex; justify-content: space-between; align-items: baseline; padding: clamp(8px, 1.8vh, 14px) 0; flex: 0 0 auto; }
+    .brand { font-weight: 600; font-size: clamp(13px, 2.4vh, 16px); letter-spacing: 0.02em; }
+    .brand .slash { color: var(--ink-faint); margin: 0 6px; }
+    .brand-sub { font-family: var(--mono); font-size: clamp(8px, 1.6vh, 10.5px); letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-soft); }
+
+    .main { flex: 1 1 auto; min-height: 0; display: flex; gap: clamp(16px, 3.5vw, 40px); align-items: center; padding: clamp(8px, 2vh, 18px) 0; }
+    .left { flex: 1 1 52%; min-width: 0; }
+    .kicker { font-family: var(--mono); font-size: clamp(8px, 1.6vh, 10px); letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 clamp(6px, 1.4vh, 12px); }
+    .slogan { font-family: var(--serif); font-weight: 600; font-size: clamp(20px, 4.8vh, 32px); line-height: 1.25; margin: 0 0 clamp(8px, 1.8vh, 14px); }
+    .slogan .accent { font-style: italic; color: var(--violet); }
+    .desc { font-size: clamp(11px, 2vh, 13.5px); line-height: 1.7; color: var(--ink-soft); margin: 0 0 clamp(10px, 2.2vh, 18px); }
+    .services { font-family: var(--mono); font-size: clamp(9px, 1.8vh, 11px); letter-spacing: 0.1em; color: var(--violet); margin: 0; }
+    .services .sep { color: var(--ink-faint); margin: 0 8px; }
+
+    .right { flex: 0 0 auto; display: flex; gap: clamp(12px, 2vw, 22px); align-items: center; }
+    .qr { text-align: center; }
+    .qr img {
+      width: clamp(120px, 30vh, 190px); height: auto; display: block;
+      border: 1px solid var(--line-soft); border-radius: 12px; background: #fff;
+    }
+    .qr .lbl { font-family: var(--mono); font-size: clamp(8px, 1.6vh, 10px); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); margin-top: 8px; }
+    .qr .lbl b { color: var(--ink); font-weight: 500; }
+
+    @media (max-width: 680px) {
+      body { overflow: auto; }
+      .main { flex-direction: column; align-items: stretch; }
+      .right { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="rule"></div>
+    <div class="brand-row">
+      <div class="brand">Amber Huang<span class="slash">/</span>加七</div>
+      <div class="brand-sub">AI Marketing · Creator Ecosystem · AI Workflow</div>
+    </div>
+    <div class="rule"></div>
+
+    <div class="main">
+      <div class="left">
+        <p class="kicker">Let's build something</p>
+        <h1 class="slogan">The best ideas live where <span class="accent">data</span> meets <span class="accent">the human</span>.</h1>
+        <p class="desc">带一队 AI agent 做营销的操盘手。想聊增长、达人生态、AI 工作流，或者聊聊怎么一起搞事——扫码直接找我。</p>
+        <p class="services">COFFEE CHAT<span class="sep">/</span>播客录制<span class="sep">/</span>展会合作<span class="sep">/</span>校园分享</p>
+      </div>
+      <div class="right">
+        <div class="qr">
+          <img src="../assets/qr/feishu.png" alt="Feishu QR" />
+          <p class="lbl"><b>Feishu</b> · 飞书个人版</p>
+        </div>
+        <div class="qr">
+          <img src="../assets/qr/wechat.jpg" alt="WeChat QR" />
+          <p class="lbl"><b>WeChat</b> · 微信</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rule"></div>
+    <div class="brand-row">
+      <div class="brand-sub">hi@amberhuang.world</div>
+      <div class="brand-sub"><a href="https://amberhuang.world" target="_blank" rel="noopener" style="color:var(--violet);text-decoration:none;">amberhuang.world</a></div>
+    </div>
+    <div class="rule"></div>
+  </div>
+</body>
+</html>
