@@ -479,6 +479,12 @@
     @media (max-height: 430px) {
       .atlas-readout { display: none; }
     }
+    /* 正面卡片下小字隐藏（保留翻转提示） */
+    .atlas-label .meta-row .project { display: none; }
+    /* 卡背：全文可滚动，不再截断 */
+    .atlas-face.back .back-content { overflow-y: auto; scrollbar-width: thin; padding-right: 4px; }
+    .atlas-face.back .back-body { overflow: visible; display: block; -webkit-line-clamp: unset; }
+    .atlas-face.back .back-title { font-size: clamp(18px, 3.2vh, 30px); }
   </style>
 </head>
 <body>
@@ -523,7 +529,7 @@
 
     <footer class="meta">
       <span>Built by <a href="https://amberhuang.world" target="_blank" rel="noopener">Amber Huang</a></span>
-      <span><a href="https://github.com/hiamberhuang/journey" target="_blank" rel="noopener">GitHub</a><span class="sep">·</span>Vanilla JS + SVG + CSS · 0 dependencies</span>
+      <span><span lang="zh">开源代码 · </span><span lang="en">Open source · </span><a href="https://github.com/hiamberhuang/journey" target="_blank" rel="noopener">GitHub</a></span>
     </footer>
   </div>
 
@@ -563,7 +569,7 @@
         country: 'Digital Marketing Intern', country_zh: '数字营销实习生',
         lat: 32.72, lon: -117.16,
         img: 'assets/photos/experience/cbs.jpg',
-        tag: 'B · Field rotation', tag_zh: 'B · 实战轮岗',
+        tag: 'B · Where I interned', tag_zh: 'B · 我实习的地方',
         proj: 'CBS News 8 · TEGNA', proj_zh: 'CBS News 8 · TEGNA',
         sub: 'A summer inside a 700k-DAU broadcaster.', sub_zh: '一个夏天，泡在 70 万 DAU 的本地媒体集团里。',
         role: 'Digital Marketing Intern', role_zh: '数字营销实习生',
