@@ -86,7 +86,6 @@
       transition:
         transform 900ms cubic-bezier(0.22, 1, 0.36, 1),
         opacity   600ms ease,
-        filter    600ms ease,
         width     900ms cubic-bezier(0.22, 1, 0.36, 1);
     }
     .atlas-card.is-active { width: var(--card-w-active); }
@@ -690,11 +689,11 @@
     });
 
     const slotPos = [
-      { x: -490, y: 86, rot: -26, scale: 0.78, op: 0.30, blur: 1.6, z: 1 },
-      { x: -300, y: 24, rot: -13, scale: 0.89, op: 0.55, blur: 0.4, z: 2 },
+      { x: -490, y: 86, rot: -26, scale: 0.78, op: 0.30, blur: 0, z: 1 },
+      { x: -300, y: 24, rot: -13, scale: 0.89, op: 0.55, blur: 0, z: 2 },
       { x:    0, y:  0, rot:   0, scale: 1.00, op: 1.00, blur: 0,   z: 5 },
-      { x:  300, y: 24, rot:  13, scale: 0.89, op: 0.55, blur: 0.4, z: 2 },
-      { x:  490, y: 86, rot:  26, scale: 0.78, op: 0.30, blur: 1.6, z: 1 }
+      { x:  300, y: 24, rot:  13, scale: 0.89, op: 0.55, blur: 0, z: 2 },
+      { x:  490, y: 86, rot:  26, scale: 0.78, op: 0.30, blur: 0, z: 1 }
     ];
 
     const latG = document.getElementById('atlasLatitudes');
@@ -865,7 +864,7 @@
         const pos = slotPos[slot];
         el.style.transform = `translate(-50%, 0) translate(${pos.x}px, ${pos.y}px) rotate(${pos.rot}deg) scale(${pos.scale})`;
         el.style.opacity = pos.op;
-        el.style.filter = pos.blur > 0 ? `blur(${pos.blur}px)` : 'none';
+        el.style.filter = 'none';
         el.style.zIndex = pos.z;
         const isActive = (i === active);
         el.classList.toggle('is-active', isActive);
