@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -38,7 +38,7 @@
     }
     .lang-float button.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 
-    .main { flex: 1 1 auto; min-height: 0; display: flex; gap: clamp(18px, 3.5vw, 44px); align-items: center; padding-top: clamp(8px, 2vh, 20px); }
+    .main { cursor: pointer; flex: 1 1 auto; min-height: 0; display: flex; gap: clamp(18px, 3.5vw, 44px); align-items: center; padding-top: clamp(8px, 2vh, 20px); }
     .left { flex: 1 1 54%; min-width: 0; }
     .right { flex: 1 1 46%; min-width: 0; align-self: stretch; display: flex; align-items: center; }
 
@@ -78,7 +78,7 @@
 </head>
 <body>
   <div class="wrap">
-    <div class="lang-float"><button data-lang="en">EN</button><button data-lang="zh">中</button></div>
+    
 
     <div class="main">
       <div class="left">
@@ -112,19 +112,7 @@
     </div>
   </div>
 
-  <script>
-    (function() {
-      const btns = document.querySelectorAll('.lang-float button');
-      function setLang(l) {
-        document.documentElement.setAttribute('lang', l);
-        btns.forEach(b => b.classList.toggle('active', b.dataset.lang === l));
-        try { localStorage.setItem('journey-lang', l); } catch(e) {}
-      }
-      let saved = null; try { saved = localStorage.getItem('journey-lang'); } catch(e) {}
-      setLang(saved || 'zh');
-      btns.forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
-    })();
-  </script>
+  
 
   <script>
     (function() {
@@ -147,6 +135,13 @@
         document.querySelectorAll('.val').forEach((v, i) => setTimeout(() => animate(v), 250 + i * 130));
       });
     })();
+  </script>
+
+  <script>
+    document.querySelector('.main').addEventListener('click', function(e) {
+      if (e.target.closest('a')) return;
+      window.open('https://amberhuang.world/#founded', '_blank', 'noopener');
+    });
   </script>
 </body>
 </html>

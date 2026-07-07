@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -489,7 +489,7 @@
 </head>
 <body>
   <div class="wrap">
-    <div class="lang-float"><button data-lang="en">EN</button><button data-lang="zh">中</button></div>
+    
 
     <div class="atlas-stage">
       <div class="atlas-cards-wrap">
@@ -527,19 +527,7 @@
     
   </div>
 
-  <script>
-    (function() {
-      const btns = document.querySelectorAll('.lang-float button');
-      function setLang(l) {
-        document.documentElement.setAttribute('lang', l);
-        btns.forEach(b => b.classList.toggle('active', b.dataset.lang === l));
-        try { localStorage.setItem('journey-lang', l); } catch(e) {}
-      }
-      let saved = null; try { saved = localStorage.getItem('journey-lang'); } catch(e) {}
-      setLang(saved || 'zh');
-      btns.forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
-    })();
-  </script>
+  
   <script>
 
   (function() {
