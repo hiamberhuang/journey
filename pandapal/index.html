@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PandaPal · Founded by Amber</title>
+  <meta name="description" content="PandaPal — the USC student community Amber co-founded: 40k users in 18 months, zero ad budget." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #ffffff; --ink: #0F1419; --ink-soft: rgba(15,20,25,0.58); --ink-faint: rgba(15,20,25,0.35);
+      --line: rgba(15,20,25,0.12); --line-soft: rgba(15,20,25,0.07);
+      --violet: #5B21B6;
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font-family: var(--sans); font-weight: 300; -webkit-font-smoothing: antialiased; }
+    body { overflow: hidden; }
+    html[lang="en"] [lang="zh"] { display: none !important; }
+    html[lang="zh"] [lang="en"] { display: none !important; }
+    .wrap { height: 100vh; height: 100dvh; display: flex; flex-direction: column; max-width: 1080px; margin: 0 auto; padding: 14px 22px 14px; }
+    header.meta {
+      flex: 0 0 auto; display: flex; align-items: baseline; justify-content: space-between;
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft);
+      padding-bottom: 10px; border-bottom: 1px solid var(--line-soft);
+    }
+    header.meta .brand { color: var(--ink); letter-spacing: 0.32em; font-weight: 500; }
+    header.meta .sep { margin: 0 10px; color: var(--ink-faint); }
+    .lang-mini { display: inline-flex; gap: 2px; margin-left: 12px; }
+    .lang-mini button {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 2px 8px; border: 1px solid var(--line); background: transparent; color: var(--ink-soft);
+      cursor: pointer; border-radius: 999px;
+    }
+    .lang-mini button.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+    .main { flex: 1 1 auto; min-height: 0; display: flex; gap: clamp(18px, 3.5vw, 44px); align-items: center; padding-top: clamp(8px, 2vh, 20px); }
+    .left { flex: 1 1 54%; min-width: 0; }
+    .right { flex: 1 1 46%; min-width: 0; align-self: stretch; display: flex; align-items: center; }
+
+    h1 { font-family: var(--serif); font-weight: 600; font-size: clamp(24px, 6vh, 42px); line-height: 1.12; margin: 0 0 clamp(8px, 1.8vh, 16px); }
+    h1 .accent { font-style: italic; color: var(--violet); }
+    .para { font-size: clamp(12px, 2.2vh, 14.5px); line-height: 1.7; color: var(--ink-soft); margin: 0 0 clamp(10px, 2.4vh, 22px); }
+    .para b { color: var(--ink); font-weight: 500; }
+
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(8px, 1.8vh, 18px) 24px; margin-bottom: clamp(10px, 2.4vh, 22px); }
+    .stat .num { font-family: var(--serif); font-size: clamp(22px, 4.6vh, 34px); font-weight: 600; line-height: 1; margin: 0; }
+    .stat .num .plus { color: var(--violet); }
+    .stat .lbl { font-family: var(--mono); font-size: clamp(8px, 1.5vh, 10px); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); margin: 4px 0 0; }
+
+    blockquote.vision {
+      margin: 0 0 clamp(8px, 1.6vh, 14px); padding-left: 14px; border-left: 2px solid var(--violet);
+      font-family: var(--serif); font-style: italic; font-size: clamp(13px, 2.4vh, 16px); line-height: 1.5; color: var(--ink);
+    }
+    .credit { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+    .credit a { color: var(--violet); text-decoration: none; }
+
+    .video-frame {
+      width: 100%; max-height: 100%; border-radius: 16px; overflow: hidden;
+      border: 1px solid var(--line-soft); box-shadow: 0 20px 50px -24px rgba(15,20,25,0.25);
+      display: flex;
+    }
+    .video-frame video { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    @media (max-height: 520px) {
+      blockquote.vision, .credit { display: none; }
+      .para { -webkit-line-clamp: 3; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+    }
+    @media (max-width: 640px) {
+      .main { flex-direction: column; align-items: stretch; overflow-y: auto; }
+      body { overflow: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="meta">
+      <div><span class="brand">Founded</span><span class="sep">·</span><span lang="en">PandaPal</span><span lang="zh">PandaPal · 创业</span></div>
+      <div><span lang="en">USC · 2023</span><span lang="zh">USC · 2023</span><span class="lang-mini"><button data-lang="en">EN</button><button data-lang="zh">中</button></span></div>
+    </header>
+
+    <div class="main">
+      <div class="left">
+        <h1>
+          <span lang="en">On campus,<br/>I founded <span class="accent">PandaPal</span>.</span>
+          <span lang="zh">在 USC 校园里，<br/>我创办了 <span class="accent">PandaPal</span>。</span>
+        </h1>
+        <p class="para">
+          <span lang="en">A USC student community I co-founded for my capstone — <b>40k users in 18 months, zero ad budget.</b> The cold-start that taught me how a brand actually gets discovered when you can't pay for reach.</span>
+          <span lang="zh">我和搭档为毕设做的一个 USC 学生社区——<b>18 个月做到 4 万用户，零广告预算。</b>这是教会我"没钱投放时品牌到底是怎么长出来的"那次 0→1，也奠定了我后来带每一支团队的操盘底层。</span>
+        </p>
+        <div class="stats">
+          <div class="stat"><p class="num">40k<span class="plus">+</span></p><p class="lbl"><span lang="en">Users · zero ad spend</span><span lang="zh">用户 · 零广告预算</span></p></div>
+          <div class="stat"><p class="num">1k<span class="plus">+</span></p><p class="lbl"><span lang="en">Campus ambassadors</span><span lang="zh">校园大使</span></p></div>
+          <div class="stat"><p class="num">100<span class="plus">+</span></p><p class="lbl"><span lang="en">Active communities</span><span lang="zh">活跃社群</span></p></div>
+          <div class="stat"><p class="num">80<span class="plus">+</span></p><p class="lbl"><span lang="en">Brand partnerships · AOV $1k</span><span lang="zh">品牌合作 · 客单 $1k</span></p></div>
+        </div>
+        <blockquote class="vision">
+          <span lang="en">"A one-stop lifestyle platform for overseas Chinese students — built by USC students, for USC students."</span>
+          <span lang="zh">"给海外中国留学生做一个一站式生活社区——USC 学生做给 USC 学生用。"</span>
+        </blockquote>
+        <p class="credit"><span lang="en">USC Annenberg Capstone · Co-founded with <a href="https://www.linkedin.com/in/chen-zhe/" target="_blank" rel="noopener">Summer Chen</a> · 2023</span><span lang="zh">USC Annenberg 毕设 · 与 <a href="https://www.linkedin.com/in/chen-zhe/" target="_blank" rel="noopener">Summer Chen</a> 联合创办 · 2023</span></p>
+      </div>
+      <div class="right">
+        <div class="video-frame">
+          <video autoplay loop muted playsinline webkit-playsinline preload="auto">
+            <source src="../assets/videos/pandapal.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const btns = document.querySelectorAll('.lang-mini button');
+      function setLang(l) {
+        document.documentElement.setAttribute('lang', l);
+        btns.forEach(b => b.classList.toggle('active', b.dataset.lang === l));
+        try { localStorage.setItem('journey-lang', l); } catch(e) {}
+      }
+      let saved = null; try { saved = localStorage.getItem('journey-lang'); } catch(e) {}
+      setLang(saved || 'zh');
+      btns.forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+    })();
+  </script>
+</body>
+</html>

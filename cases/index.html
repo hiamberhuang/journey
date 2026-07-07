@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cases · Amber 的代表战役</title>
+  <meta name="description" content="Featured plays by Amber Huang on Rednote, TikTok and bilibili — data, conversion, cultural lift." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #ffffff; --ink: #0F1419; --ink-soft: rgba(15,20,25,0.58); --ink-faint: rgba(15,20,25,0.35);
+      --line: rgba(15,20,25,0.12); --line-soft: rgba(15,20,25,0.07);
+      --violet: #5B21B6; --violet-soft: #EDE9FE;
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font-family: var(--sans); font-weight: 300; -webkit-font-smoothing: antialiased; }
+    body { overflow: hidden; }
+    html[lang="en"] [lang="zh"] { display: none !important; }
+    html[lang="zh"] [lang="en"] { display: none !important; }
+    .wrap { height: 100vh; height: 100dvh; display: flex; flex-direction: column; max-width: 1080px; margin: 0 auto; padding: 14px 22px 14px; }
+    header.meta {
+      flex: 0 0 auto; display: flex; align-items: baseline; justify-content: space-between;
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft);
+      padding-bottom: 10px; border-bottom: 1px solid var(--line-soft);
+    }
+    header.meta .brand { color: var(--ink); letter-spacing: 0.32em; font-weight: 500; }
+    header.meta .sep { margin: 0 10px; color: var(--ink-faint); }
+    .lang-mini { display: inline-flex; gap: 2px; margin-left: 12px; }
+    .lang-mini button {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 2px 8px; border: 1px solid var(--line); background: transparent; color: var(--ink-soft);
+      cursor: pointer; border-radius: 999px;
+    }
+    .lang-mini button.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+    .row { flex: 1 1 auto; min-height: 0; display: flex; gap: clamp(12px, 2.4vw, 28px); justify-content: center; align-items: center; padding-top: clamp(8px, 2vh, 18px); }
+    .card {
+      position: relative; height: 100%; max-height: 100%; aspect-ratio: 9 / 14.5;
+      border-radius: 18px; overflow: hidden; background: #111;
+      box-shadow: 0 22px 50px -24px rgba(15,20,25,0.4);
+      text-decoration: none; display: block; flex: 0 1 auto;
+      transition: transform .25s ease;
+    }
+    .card:hover { transform: translateY(-4px); }
+    .card video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .card .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,10,14,0.35) 0%, rgba(10,10,14,0) 30%, rgba(10,10,14,0.05) 55%, rgba(10,10,14,0.78) 100%); }
+    .card .meta-top {
+      position: absolute; top: 12px; left: 14px; right: 14px;
+      display: flex; justify-content: space-between;
+      font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.85);
+    }
+    .card .body { position: absolute; left: 16px; right: 16px; bottom: 14px; color: #fff; }
+    .card .platform { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.75); margin: 0 0 6px; }
+    .card .title { font-family: var(--serif); font-size: clamp(16px, 3.4vh, 22px); font-weight: 600; line-height: 1.15; margin: 0 0 6px; }
+    .card .kpi { font-family: var(--mono); font-size: clamp(9px, 1.8vh, 11px); letter-spacing: 0.08em; color: rgba(255,255,255,0.85); margin: 0 0 10px; }
+    .card .cta {
+      display: inline-block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: #fff; border: 1px solid rgba(255,255,255,0.55); border-radius: 999px; padding: 5px 12px;
+      background: rgba(255,255,255,0.08); backdrop-filter: blur(4px);
+    }
+    .card:hover .cta { background: #fff; color: var(--ink); border-color: #fff; }
+
+    footer.meta {
+      flex: 0 0 auto; display: flex; justify-content: space-between;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft);
+      padding-top: 12px; margin-top: 12px; border-top: 1px solid var(--line-soft);
+    }
+    footer.meta a { color: var(--violet); text-decoration: none; }
+    @media (max-height: 500px) { footer.meta { display: none; } }
+    @media (max-width: 640px) {
+      body { overflow: auto; }
+      .row { flex-direction: column; align-items: center; }
+      .card { height: auto; width: min(78vw, 320px); aspect-ratio: 9 / 14.5; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="meta">
+      <div><span class="brand">Cases</span><span class="sep">·</span><span lang="en">Featured plays</span><span lang="zh">代表战役</span></div>
+      <div><span lang="en">Rednote · TikTok · bilibili</span><span lang="zh">小红书 · TikTok · bilibili</span><span class="lang-mini"><button data-lang="en">EN</button><button data-lang="zh">中</button></span></div>
+    </header>
+
+    <div class="row">
+      <a class="card" href="https://amberhuang.world/#cases" target="_blank" rel="noopener">
+        <video autoplay loop muted playsinline webkit-playsinline preload="auto"><source src="../assets/videos/case-xhs.mp4" type="video/mp4"></video>
+        <div class="shade"></div>
+        <div class="meta-top"><span><span lang="en">Part 01 / 03</span><span lang="zh">第 01 / 03 篇</span></span><span>9:16</span></div>
+        <div class="body">
+          <p class="platform"><span lang="en">KOS Matrix · North America</span><span lang="zh">KOS 矩阵 · 北美市场</span></p>
+          <p class="title"><span lang="en">Rednote × Think Academy</span><span lang="zh">小红书 × 学而思</span></p>
+          <p class="kpi"><span lang="en">−38% lead cost · 2.4× enrollment</span><span lang="zh">获客成本 −38% · 报名 2.4×</span></p>
+          <span class="cta"><span lang="en">Open case →</span><span lang="zh">查看案例 →</span></span>
+        </div>
+      </a>
+      <a class="card" href="https://amberhuang.world/#cases" target="_blank" rel="noopener">
+        <video autoplay loop muted playsinline webkit-playsinline preload="auto"><source src="../assets/videos/case-tiktok.mp4" type="video/mp4"></video>
+        <div class="shade"></div>
+        <div class="meta-top"><span><span lang="en">Part 02 / 03</span><span lang="zh">第 02 / 03 篇</span></span><span>9:16</span></div>
+        <div class="body">
+          <p class="platform"><span lang="en">TIKTAL · North America</span><span lang="zh">TIKTAL · 北美市场</span></p>
+          <p class="title"><span lang="en">TikTok × PetSmart</span><span lang="zh">TikTok × PetSmart</span></p>
+          <p class="kpi"><span lang="en">CTR 8 → 20% · 30k UGC</span><span lang="zh">点击率 8 → 20% · 3 万 UGC</span></p>
+          <span class="cta"><span lang="en">Open case →</span><span lang="zh">查看案例 →</span></span>
+        </div>
+      </a>
+      <a class="card" href="https://amberhuang.world/#cases" target="_blank" rel="noopener">
+        <video autoplay loop muted playsinline webkit-playsinline preload="auto"><source src="../assets/videos/case-bilibili.mp4" type="video/mp4"></video>
+        <div class="shade"></div>
+        <div class="meta-top"><span><span lang="en">Part 03 / 03</span><span lang="zh">第 03 / 03 篇</span></span><span>9:16</span></div>
+        <div class="body">
+          <p class="platform"><span lang="en">CCTV Spring Gala · 2024</span><span lang="zh">央视春晚 · 2024</span></p>
+          <p class="title"><span lang="en">Bilibili × CCTV Live</span><span lang="zh">bilibili × 央视春晚直播</span></p>
+          <p class="kpi"><span lang="en">1M+ live · Top 10 site-wide</span><span lang="zh">百万级进房 · 全站 Top 10</span></p>
+          <span class="cta"><span lang="en">Open case →</span><span lang="zh">查看案例 →</span></span>
+        </div>
+      </a>
+    </div>
+
+    <footer class="meta">
+      <span><span lang="en">Full case write-ups on</span><span lang="zh">完整案例拆解在</span> <a href="https://amberhuang.world/#cases" target="_blank" rel="noopener">amberhuang.world</a></span>
+      <span>Insight → Strategy → Outcome</span>
+    </footer>
+  </div>
+
+  <script>
+    (function() {
+      const btns = document.querySelectorAll('.lang-mini button');
+      function setLang(l) {
+        document.documentElement.setAttribute('lang', l);
+        btns.forEach(b => b.classList.toggle('active', b.dataset.lang === l));
+        try { localStorage.setItem('journey-lang', l); } catch(e) {}
+      }
+      let saved = null; try { saved = localStorage.getItem('journey-lang'); } catch(e) {}
+      setLang(saved || 'zh');
+      btns.forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+    })();
+  </script>
+</body>
+</html>
