@@ -22,7 +22,7 @@
     body { overflow: hidden; display: flex; align-items: center; justify-content: center; }
     .card {
       width: min(920px, calc(100vw - 32px)); max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px);
-      background: #fdfdfc; border: 1px solid var(--line-soft); border-radius: 6px;
+      background: #ffffff; border: 1px solid var(--line-soft); border-radius: 6px;
       padding: clamp(16px, 4vh, 34px) clamp(20px, 4vw, 44px);
       display: flex; flex-direction: column; overflow: hidden;
     }
@@ -44,8 +44,8 @@
     .right { flex: 0 0 auto; display: flex; gap: clamp(12px, 2vw, 22px); align-items: center; }
     .qr { text-align: center; }
     .qr img {
-      width: clamp(120px, 30vh, 190px); height: auto; display: block;
-      border: 1px solid var(--line-soft); border-radius: 12px; background: #fff;
+      width: clamp(130px, 32vh, 200px); height: auto; display: block;
+      border: 1px solid var(--line-soft); border-radius: 8px; background: #fff; padding: 6px;
     }
     .qr .lbl { font-family: var(--mono); font-size: clamp(8px, 1.6vh, 10px); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); margin-top: 8px; }
     .qr .lbl b { color: var(--ink); font-weight: 500; }
@@ -75,11 +75,11 @@
       </div>
       <div class="right">
         <div class="qr">
-          <img src="../assets/qr/feishu.png" alt="Feishu QR" />
+          <img src="../assets/qr/feishu-qr.png" alt="Feishu QR" />
           <p class="lbl"><b>Feishu</b> · 飞书个人版</p>
         </div>
         <div class="qr">
-          <img src="../assets/qr/wechat.jpg" alt="WeChat QR" />
+          <img src="../assets/qr/wechat-qr.png" alt="WeChat QR" />
           <p class="lbl"><b>WeChat</b> · 微信</p>
         </div>
       </div>
