@@ -48,7 +48,7 @@
     .para b { color: var(--ink); font-weight: 500; }
 
     .stats { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(8px, 1.8vh, 18px) 24px; margin-bottom: clamp(10px, 2.4vh, 22px); }
-    .stat { cursor: default; } .stat:hover .num { color: var(--violet); } .stat .num { transition: color .25s; font-family: var(--serif); font-size: clamp(22px, 4.6vh, 34px); font-weight: 600; line-height: 1; margin: 0; }
+    .stat { cursor: default; } .stat:hover .num { color: var(--violet); } .stat .num { transition: color .3s, transform .5s cubic-bezier(.22,1.4,.36,1); font-family: var(--serif); } .stat .num.bump { transform: translateY(-4px); } .stat .num .val { display: inline-block; text-align: left; } .stat .num { font-size: clamp(22px, 4.6vh, 34px); font-weight: 600; line-height: 1; margin: 0; }
     .stat .num .plus { color: var(--violet); }
     .stat .lbl { font-family: var(--mono); font-size: clamp(8px, 1.5vh, 10px); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); margin: 4px 0 0; }
 
@@ -118,21 +118,30 @@
     (function() {
       function animate(el) {
         const target = +el.dataset.target, suf = el.dataset.suffix || '';
-        const dur = 900, t0 = performance.now();
+        const dur = 1600, t0 = performance.now();
+        const num = el.closest('.num');
+        num.classList.add('bump');
+        setTimeout(() => num.classList.remove('bump'), 500);
         function step(now) {
           const p = Math.min(1, (now - t0) / dur);
-          const ease = 1 - Math.pow(1 - p, 3);
+          const ease = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
           el.textContent = Math.round(target * ease) + suf;
           if (p < 1) requestAnimationFrame(step);
         }
         requestAnimationFrame(step);
       }
+      // 锁定终值宽度,防止 + 号左右跳
+      document.querySelectorAll('.val').forEach(v => { v.style.minWidth = v.offsetWidth + 'px'; });
+      let cooling = false;
       document.querySelectorAll('.stat').forEach(s => {
         const v = s.querySelector('.val');
-        if (v) s.addEventListener('mouseenter', () => animate(v));
+        if (v) s.addEventListener('mouseenter', () => {
+          if (cooling) return; cooling = true; setTimeout(() => cooling = false, 400);
+          animate(v);
+        });
       });
       window.addEventListener('load', () => {
-        document.querySelectorAll('.val').forEach((v, i) => setTimeout(() => animate(v), 250 + i * 130));
+        document.querySelectorAll('.val').forEach((v, i) => setTimeout(() => animate(v), 300 + i * 180));
       });
     })();
   </script>

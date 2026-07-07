@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Life · Amber off the clock</title>
+  <meta name="description" content="Amber off the clock — kpop dance, food, photography, travel." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #ffffff; --ink: #0F1419; --ink-soft: rgba(15,20,25,0.58);
+      --line: rgba(15,20,25,0.12); --line-soft: rgba(15,20,25,0.07);
+      --violet: #5B21B6; --violet-soft: #EDE9FE;
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font-family: var(--sans); font-weight: 300; -webkit-font-smoothing: antialiased; }
+    body { overflow: hidden; }
+    .wrap { height: 100vh; height: 100dvh; display: flex; flex-direction: column; max-width: 1040px; margin: 0 auto; padding: 12px 20px 14px; }
+
+    .collage {
+      flex: 1 1 auto; min-height: 0;
+      display: grid; gap: clamp(10px, 1.8vh, 16px);
+      grid-template-columns: 0.9fr 1fr 1fr;
+      grid-template-rows: 1.1fr 1fr;
+      grid-template-areas:
+        "kpop food photo"
+        "kpop travel travel";
+      padding: clamp(6px, 1.5vh, 14px) 0;
+    }
+    .tile {
+      position: relative; border-radius: 14px; overflow: visible;
+      transition: transform .35s cubic-bezier(.22,1.2,.36,1), opacity .3s, filter .3s;
+    }
+    .tile .ph {
+      position: absolute; inset: 0; border-radius: 14px; overflow: hidden;
+      background: #f4f1ea; border: 1px solid var(--line-soft);
+      box-shadow: 0 16px 36px -20px rgba(15,20,25,0.28);
+      transition: box-shadow .35s;
+    }
+    .tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .tile.t-kpop { transform: rotate(-1.6deg); grid-area: kpop; }
+    .tile.t-food { transform: rotate(1.2deg); grid-area: food; }
+    .tile.t-photo { transform: rotate(-1deg); grid-area: photo; }
+    .tile.t-travel { transform: rotate(0.8deg); grid-area: travel; }
+    .tile.t-photo img { filter: brightness(1.16) saturate(1.06); }
+
+    .tag {
+      position: absolute; z-index: 5;
+      font-family: var(--sans); font-weight: 700; font-size: clamp(11px, 2.2vh, 15px);
+      background: #fff; color: var(--ink);
+      padding: 6px 14px; border-radius: 8px;
+      box-shadow: 0 8px 20px -8px rgba(15,20,25,0.35);
+      transition: background .3s, color .3s, transform .35s cubic-bezier(.22,1.2,.36,1);
+      white-space: nowrap;
+    }
+    .t-kpop .tag { left: -8px; bottom: 26px; transform: rotate(-3deg); }
+    .t-food .tag { top: -10px; left: 50%; transform: translateX(-50%) rotate(1deg); }
+    .t-photo .tag { right: -8px; top: 38%; transform: rotate(4deg); }
+    .t-travel .tag { bottom: -10px; left: 42%; transform: rotate(-1deg); }
+
+    /* hover:当前板块突出,其余退后 */
+    .collage:hover .tile:not(:hover) { opacity: 0.45; filter: saturate(0.6); }
+    .tile:hover { transform: rotate(0deg) scale(1.045); z-index: 10; }
+    .tile:hover .ph { box-shadow: 0 30px 60px -24px rgba(91,33,182,0.35); }
+    .tile:hover .tag { background: var(--violet); color: #fff; }
+
+    .placeholder {
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #EDE9FE, #DDD6FE);
+      color: var(--violet); font-family: var(--mono); font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+      height: 100%;
+    }
+
+    footer.line {
+      flex: 0 0 auto; display: flex; justify-content: space-between; align-items: baseline;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft);
+      padding-top: 10px; border-top: 1px solid var(--line-soft);
+    }
+    footer.line .accent { color: var(--violet); }
+    @media (max-height: 430px) { footer.line { display: none; } }
+    @media (max-width: 620px) {
+      body { overflow: auto; }
+      .collage { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto; grid-template-areas: "kpop food" "kpop photo" "travel travel"; }
+      .tile { min-height: 180px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="collage">
+      <div class="tile t-kpop">
+        <div class="ph"><img src="../assets/photos/life/kpop.jpg" alt="Kpop dance" /></div>
+        <span class="tag">Kpop Dancer</span>
+      </div>
+      <div class="tile t-food">
+        <div class="ph"><div class="placeholder">Food photo →</div></div>
+        <span class="tag">Food Blogger</span>
+      </div>
+      <div class="tile t-photo">
+        <div class="ph"><div class="placeholder">Balloon photo →</div></div>
+        <span class="tag">Photographer</span>
+      </div>
+      <div class="tile t-travel">
+        <div class="ph"><div class="placeholder">Skydive photo →</div></div>
+        <span class="tag">Travel Vlogger</span>
+      </div>
+    </div>
+    <footer class="line">
+      <span>About me · off the clock</span>
+      <span><span class="accent">Dance · Eat · Shoot · Fly</span></span>
+    </footer>
+  </div>
+</body>
+</html>
